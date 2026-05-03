@@ -152,7 +152,7 @@
                 <div class="pt-2 border-t border-slate-100 space-y-4">
                     <div>
                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Email Akun Baru</label>
-                        <input type="email" id="reg-email" required placeholder="contoh@gmail.com" autocomplete="off" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                        <input type="email" id="reg-email" required placeholder="contoh@gmail.com" autocomplete="none" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Buat Kata Sandi</label>
@@ -2311,13 +2311,20 @@
         window.onload = () => {
             if(localStorage.getItem('saas_logo')) document.getElementById('company-logo').src = localStorage.getItem('saas_logo');
             
-            // Script Paksa Bersihkan Form dari Autofill Browser Bandel
-            setTimeout(() => {
+            // Script Paksa Bersihkan Form dari Autofill Browser Bandel secara Agresif
+            const clearBrowserAutofill = () => {
                 const loginEmail = document.getElementById('login-email');
                 const loginPass = document.getElementById('login-password');
+                const regEmail = document.getElementById('reg-email');
                 if(loginEmail && !window.user) loginEmail.value = '';
                 if(loginPass && !window.user) loginPass.value = '';
-            }, 100);
+                if(regEmail && !window.user) regEmail.value = '';
+            };
+            
+            // Hajar autofill browser di detik ke 0.1, 0.5, dan 2 detik
+            setTimeout(clearBrowserAutofill, 100);
+            setTimeout(clearBrowserAutofill, 500);
+            setTimeout(clearBrowserAutofill, 2000);
         };
 
         // Initialize App
