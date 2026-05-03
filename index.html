@@ -935,6 +935,23 @@
         </div>
     </div>
 
+    <!-- CUSTOM ALERT / CONFIRM MODAL (MENGATASI BLOKIR BROWSER) -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[999999]">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up text-center relative">
+            <div class="p-6">
+                <div id="alert-icon" class="w-16 h-16 rounded-full bg-brand-50 text-brand-500 flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <h3 id="alert-title" class="text-lg font-black text-slate-800 mb-2 tracking-tight">Notifikasi</h3>
+                <p id="alert-message" class="text-sm font-medium text-slate-500 mb-6 leading-relaxed"></p>
+                <div class="flex gap-3 justify-center">
+                    <button id="alert-btn-cancel" class="hidden flex-1 py-3.5 bg-slate-100 text-slate-600 font-black rounded-xl hover:bg-slate-200 transition-colors active:scale-95">Batal</button>
+                    <button id="alert-btn-ok" class="flex-1 py-3.5 bg-brand-600 text-white font-black rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-500/30 transition-all active:scale-95 tracking-wide">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALS SECTION (Updated to Mobile App Styles) -->
     
     <!-- MODAL TAMBAH / EDIT PELANGGAN -->
@@ -1512,6 +1529,41 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : "saas-erp-system-f42b8";
 
         // ==========================================
+        // CUSTOM MODAL ALERTS (MENGATASI BLOKIR BROWSER)
+        // ==========================================
+        window.showAlert = (msg, isError = false) => {
+            document.getElementById('alert-title').innerText = isError ? 'Peringatan' : 'Berhasil';
+            document.getElementById('alert-message').innerText = msg;
+            document.getElementById('alert-icon').className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm ${isError ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`;
+            document.getElementById('alert-icon').innerHTML = isError ? '<i class="fa-solid fa-triangle-exclamation"></i>' : '<i class="fa-solid fa-circle-check"></i>';
+            document.getElementById('alert-btn-cancel').classList.add('hidden');
+            const btnOk = document.getElementById('alert-btn-ok');
+            btnOk.className = `flex-1 py-3.5 text-white font-black rounded-xl shadow-lg transition-all active:scale-95 tracking-wide ${isError ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/30' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/30'}`;
+            btnOk.onclick = () => { document.getElementById('custom-alert-modal').classList.add('hidden'); document.getElementById('custom-alert-modal').classList.remove('flex'); };
+            document.getElementById('custom-alert-modal').classList.remove('hidden');
+            document.getElementById('custom-alert-modal').classList.add('flex');
+        };
+
+        window.showConfirm = (msg, onConfirm) => {
+            document.getElementById('alert-title').innerText = 'Konfirmasi';
+            document.getElementById('alert-message').innerText = msg;
+            document.getElementById('alert-icon').className = 'w-16 h-16 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm';
+            document.getElementById('alert-icon').innerHTML = '<i class="fa-solid fa-circle-question"></i>';
+            document.getElementById('alert-btn-cancel').classList.remove('hidden');
+            document.getElementById('alert-btn-cancel').onclick = () => { document.getElementById('custom-alert-modal').classList.add('hidden'); document.getElementById('custom-alert-modal').classList.remove('flex'); };
+            const btnOk = document.getElementById('alert-btn-ok');
+            btnOk.className = 'flex-1 py-3.5 bg-brand-600 text-white font-black rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-500/30 transition-all active:scale-95 tracking-wide';
+            btnOk.innerText = 'Ya, Lanjutkan';
+            btnOk.onclick = () => {
+                document.getElementById('custom-alert-modal').classList.add('hidden'); document.getElementById('custom-alert-modal').classList.remove('flex');
+                onConfirm();
+            };
+            document.getElementById('custom-alert-modal').classList.remove('hidden');
+            document.getElementById('custom-alert-modal').classList.add('flex');
+        };
+        // ==========================================
+
+        // ==========================================
         // KONFIGURASI SUPER ADMIN (PEMILIK SOFTWARE)
         // ==========================================
         window.OWNER_EMAIL = "irsukin@gmail.com"; 
@@ -1748,7 +1800,7 @@
             tempInput.select();
             document.execCommand("copy");
             document.body.removeChild(tempInput);
-            alert("✅ Kode berhasil disalin!\n\nBerikan kode ini kepada karyawan Anda agar mereka bisa mendaftar dan bergabung ke perusahaan ini.");
+            window.showAlert("Kode berhasil disalin!\nBerikan kode ini kepada karyawan agar bisa bergabung.");
         };
 
         window.toggleAuthMode = () => {
@@ -1766,7 +1818,7 @@
                 const pass = document.getElementById('login-password').value;
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch (err) {
-                alert("Gagal Masuk: Email atau Kata Sandi salah.");
+                window.showAlert("Gagal Masuk: Email atau Kata Sandi salah.", true);
                 btn.innerText = oldText; btn.disabled = false;
             }
         };
@@ -1810,26 +1862,26 @@
                     
                 } catch (dbErr) {
                     if (dbErr.code === 'permission-denied' || dbErr.message.includes('permissions')) {
-                        alert("✅ Akun berhasil didaftarkan!\n\n❌ Namun, Firestore Database Firebase Anda belum disetting Rules-nya. Silakan update Rules Firebase Anda terlebih dahulu agar sistem bisa membaca data.");
+                        window.showAlert("Akun terdaftar, namun database Firebase Anda belum disetting Rules-nya.", true);
                     } else { throw dbErr; }
                 }
             } catch (err) {
                 if (err.code === 'auth/email-already-in-use') {
-                    alert("Pendaftaran Gagal: Email ini sudah pernah didaftarkan! Gunakan email lain atau kembali ke form Login.");
+                    window.showAlert("Pendaftaran Gagal: Email sudah terdaftar!", true);
                 } else if (err.code === 'auth/weak-password') {
-                    alert("Pendaftaran Gagal: Kata sandi terlalu lemah. Gunakan minimal 6 karakter.");
+                    window.showAlert("Pendaftaran Gagal: Kata sandi terlalu lemah.", true);
                 } else {
-                    alert("Gagal Daftar: " + err.message);
+                    window.showAlert("Gagal Daftar: " + err.message, true);
                 }
                 btn.innerText = oldText; btn.disabled = false;
             }
         };
 
-        window.handleLogout = async () => {
-            if(confirm("Keluar dari sistem?")) {
+        window.handleLogout = () => {
+            window.showConfirm("Keluar dari sistem ruang kerja ini?", async () => {
                 window.toggleProfileModal(false);
                 await signOut(auth);
-            }
+            });
         };
 
         // ==========================================
@@ -1866,16 +1918,16 @@
             }).join('');
         };
 
-        window.toggleClientStatus = async (userId, newStatus) => {
-            const actionText = newStatus === 'suspended' ? 'MENGUNCI (MEMBLOKIR)' : 'MEMBUKA AKSES';
-            if(confirm(`Anda yakin ingin ${actionText} perusahaan ini?\n\nJika dikunci, seluruh staff dan bos perusahaan ini tidak akan bisa membuka database mereka sampai Anda membukanya.`)) {
+        window.toggleClientStatus = (userId, newStatus) => {
+            const actionText = newStatus === 'suspended' ? 'MENGUNCI' : 'MEMBUKA AKSES';
+            window.showConfirm(`Yakin ingin ${actionText} perusahaan ini?`, async () => {
                 try {
                     await updateDoc(doc(db, 'artifacts', appId, 'users', userId), { status: newStatus });
-                    alert(`✅ Status perusahaan berhasil diubah menjadi: ${newStatus.toUpperCase()}`);
+                    window.showAlert(`Status perusahaan diubah menjadi: ${newStatus.toUpperCase()}`);
                 } catch (err) {
-                    alert("Gagal mengubah status: " + err.message);
+                    window.showAlert("Gagal mengubah status: " + err.message, true);
                 }
-            }
+            });
         };
         // ==========================================
 
@@ -2107,7 +2159,7 @@
                 if (clientId) await updateDoc(getDocRef('clients', clientId), data);
                 else { data.createdAt = new Date().toISOString(); await addDoc(getCollRef('clients'), data); }
                 window.toggleClientCreateModal(false); e.target.reset();
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerText = oldText; btn.disabled = false; }
         };
 
@@ -2126,7 +2178,7 @@
                 if (supId) await updateDoc(getDocRef('suppliers', supId), data);
                 else { data.createdAt = new Date().toISOString(); await addDoc(getCollRef('suppliers'), data); }
                 window.toggleSupplierCreateModal(false); e.target.reset();
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerText = oldText; btn.disabled = false; }
         };
 
@@ -2170,7 +2222,7 @@
                     }
                 }
                 window.toggleDealCreateModal(false); e.target.reset(); document.getElementById('deal-id').value = '';
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerHTML = oldText; btn.disabled = false; }
         };
         
@@ -2202,7 +2254,7 @@
                     await addDoc(getCollRef('purchase_orders'), data);
                 }
                 window.togglePOModal(false); e.target.reset(); document.getElementById('po-id').value = '';
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerHTML = oldText; btn.disabled = false; }
         };
 
@@ -2233,7 +2285,7 @@
                     });
                 }
                 window.toggleInvModal(false); e.target.reset();
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerText = oldText; btn.disabled = false; }
         };
 
@@ -2254,7 +2306,7 @@
                     subtotal: sub, taxRate: inv.taxRate, ppn: amount-sub, amount: amount, category: 'Pelunasan Piutang', clientId: inv.clientId
                 });
                 window.togglePayModal(false); e.target.reset();
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerText = oldText; btn.disabled = false; }
         };
 
@@ -2271,7 +2323,7 @@
                     category: document.getElementById('inp-category').value, clientId: document.getElementById('inp-client').value || null
                 });
                 window.toggleModal(false); e.target.reset();
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerText = oldText; btn.disabled = false; }
         };
 
@@ -2288,7 +2340,7 @@
                 if (invId) await updateDoc(getDocRef('inventory', invId), data);
                 else await addDoc(getCollRef('inventory'), data);
                 window.toggleInventoryModal(false); e.target.reset();
-            } catch (err) { alert(err.message); } 
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { btn.innerText = oldText; btn.disabled = false; }
         };
 
@@ -2304,19 +2356,19 @@
                     signature: document.getElementById('set-company-signature-base64')?.value || ''
                 };
                 await setDoc(getDocRef('settings', 'company'), data, { merge: true });
-                alert("Pengaturan profil berhasil disimpan!");
-            } catch (err) { alert(err.message); } 
+                window.showAlert("Pengaturan profil berhasil disimpan!");
+            } catch (err) { window.showAlert(err.message, true); } 
             finally { setTimeout(() => { btn.innerHTML = oldText; btn.disabled = false; }, 1000); }
         };
 
         // Deletions
-        window.deleteTx = async (id) => { if(confirm("Hapus jurnal permanen?")) await deleteDoc(getDocRef('transactions', id)); };
-        window.deleteDeal = async (id) => { if(confirm("Hapus penawaran permanen?")) await deleteDoc(getDocRef('deals', id)); };
-        window.deleteInvoice = async (id) => { if(confirm("Hapus faktur permanen?")) await deleteDoc(getDocRef('invoices', id)); };
-        window.deleteClient = async (id) => { if(confirm("Hapus data klien permanen?")) await deleteDoc(getDocRef('clients', id)); };
-        window.deleteSupplier = async (id) => { if(confirm("Hapus data supplier permanen?")) await deleteDoc(getDocRef('suppliers', id)); };
-        window.deleteInventory = async (id) => { if(confirm("Hapus data barang?")) await deleteDoc(getDocRef('inventory', id)); };
-        window.deletePO = async (id) => { if(confirm("Hapus PO permanen?")) await deleteDoc(getDocRef('purchase_orders', id)); };
+        window.deleteTx = (id) => { window.showConfirm("Hapus jurnal ini secara permanen?", async () => await deleteDoc(getDocRef('transactions', id))); };
+        window.deleteDeal = (id) => { window.showConfirm("Hapus dokumen penawaran ini?", async () => await deleteDoc(getDocRef('deals', id))); };
+        window.deleteInvoice = (id) => { window.showConfirm("Hapus faktur ini permanen?", async () => await deleteDoc(getDocRef('invoices', id))); };
+        window.deleteClient = (id) => { window.showConfirm("Hapus data pelanggan ini?", async () => await deleteDoc(getDocRef('clients', id))); };
+        window.deleteSupplier = (id) => { window.showConfirm("Hapus data supplier ini?", async () => await deleteDoc(getDocRef('suppliers', id))); };
+        window.deleteInventory = (id) => { window.showConfirm("Hapus barang ini dari katalog?", async () => await deleteDoc(getDocRef('inventory', id))); };
+        window.deletePO = (id) => { window.showConfirm("Hapus Purchase Order ini?", async () => await deleteDoc(getDocRef('purchase_orders', id))); };
 
         // --- UI TOGGLERS ---
         window.toggleDateFilter = () => {
