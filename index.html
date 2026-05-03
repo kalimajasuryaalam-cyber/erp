@@ -92,10 +92,10 @@
             <!-- Login Form -->
             <form id="form-login" onsubmit="window.handleLogin(event)" class="p-8 space-y-5">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 pl-1">Email Perusahaan</label>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 pl-1">Email Karyawan / Admin</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-envelope"></i></div>
-                        <input type="email" id="login-email" required placeholder="admin@company.com" class="w-full pl-10 border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                        <input type="email" id="login-email" required placeholder="akun@company.com" class="w-full pl-10 border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
                     </div>
                 </div>
                 <div>
@@ -108,26 +108,56 @@
                 <button type="submit" class="w-full bg-gradient-to-r from-brand-600 to-brand-500 text-white p-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-brand-500/30 hover:-translate-y-0.5 transition-all duration-200 mt-2">
                     Masuk Workspace
                 </button>
-                <p class="text-center text-sm text-slate-500 mt-5 font-medium">Perusahaan belum terdaftar? <button type="button" onclick="window.toggleAuthMode()" class="text-brand-600 font-bold hover:text-brand-700 transition-colors border-b border-transparent hover:border-brand-600">Registrasi Disini</button></p>
+                <p class="text-center text-sm text-slate-500 mt-5 font-medium">Belum punya akun? <button type="button" onclick="window.toggleAuthMode()" class="text-brand-600 font-bold hover:text-brand-700 transition-colors border-b border-transparent hover:border-brand-600">Registrasi Disini</button></p>
             </form>
 
-            <!-- Register Form (Tenant Baru) -->
+            <!-- Register Form -->
             <form id="form-register" onsubmit="window.handleRegister(event)" class="p-8 space-y-4 hidden">
-                <div class="bg-brand-50 text-brand-800 p-3 rounded-xl text-[11px] font-medium mb-2 border border-brand-100 flex gap-3">
-                    <i class="fa-solid fa-shield-check text-xl text-brand-500"></i>
-                    <p>Buat akun untuk membuat ruang kerja (workspace) database mandiri yang aman dan terisolasi.</p>
+                
+                <!-- Toggles Admin vs Staff -->
+                <div class="flex bg-slate-100 p-1.5 rounded-xl mb-4 border border-slate-200">
+                    <button type="button" id="tab-reg-admin" onclick="window.setRegMode('admin')" class="flex-1 py-2 text-xs font-extrabold bg-white shadow-sm rounded-lg text-brand-600 transition-all tracking-wide">💼 Buka Perusahaan</button>
+                    <button type="button" id="tab-reg-staff" onclick="window.setRegMode('staff')" class="flex-1 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition-all tracking-wide">👨‍💻 Gabung Staff</button>
                 </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Nama Perusahaan / PIC</label>
-                    <input type="text" id="reg-name" required placeholder="" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+
+                <!-- Admin Fields -->
+                <div id="reg-admin-fields" class="space-y-4 animate-fade-in">
+                    <div class="bg-brand-50 text-brand-800 p-3 rounded-xl text-[11px] font-medium mb-2 border border-brand-100 flex gap-3">
+                        <i class="fa-solid fa-shield-check text-xl text-brand-500"></i>
+                        <p>Daftar sebagai <b>Admin Utama</b> untuk membuat ruang kerja database baru untuk perusahaan Anda.</p>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Nama Perusahaan / PIC Utama</label>
+                        <input type="text" id="reg-name" required placeholder="" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Email Admin</label>
-                    <input type="email" id="reg-email" required placeholder="admin@company.com" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+
+                <!-- Staff Fields -->
+                <div id="reg-staff-fields" class="space-y-4 hidden animate-fade-in">
+                    <div class="bg-amber-50 text-amber-800 p-3 rounded-xl text-[11px] font-medium mb-2 border border-amber-200 flex gap-3">
+                        <i class="fa-solid fa-key text-xl text-amber-500"></i>
+                        <p>Daftar sebagai <b>Karyawan</b>. Mintalah "Kode Perusahaan" dari Admin Anda untuk bisa bergabung.</p>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Kode Perusahaan (Dari Admin) *</label>
+                        <input type="text" id="reg-company-code" placeholder="Ketik kode di sini..." class="w-full border border-slate-200 p-3 rounded-xl text-sm font-mono focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Nama Lengkap Karyawan *</label>
+                        <input type="text" id="reg-staff-name" placeholder="Misal: Budi Santoso" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Buat Kata Sandi</label>
-                    <input type="password" id="reg-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                
+                <!-- Common Fields -->
+                <div class="pt-2 border-t border-slate-100 space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Email Akun Baru</label>
+                        <input type="email" id="reg-email" required placeholder="nama@company.com" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 pl-1">Buat Kata Sandi</label>
+                        <input type="password" id="reg-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full border border-slate-200 p-3 rounded-xl text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all bg-white/50">
+                    </div>
                 </div>
                 
                 <div class="flex gap-3 pt-4">
@@ -135,7 +165,7 @@
                         <i class="fa-solid fa-arrow-left"></i> Batal
                     </button>
                     <button type="submit" class="w-2/3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white p-3 rounded-xl font-bold hover:shadow-lg hover:shadow-emerald-500/30 transition-all hover:-translate-y-0.5">
-                        Buat Workspace
+                        Buat Akun
                     </button>
                 </div>
             </form>
@@ -214,15 +244,15 @@
             </nav>
 
             <div class="p-4 border-t border-slate-800/50 bg-slate-900/30 backdrop-blur">
-                <div class="flex items-center justify-between bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/50 cursor-pointer hover:bg-slate-800 transition" onclick="window.toggleProfileModal(true)">
+                <button onclick="window.toggleProfileModal(true)" class="w-full flex items-center justify-between bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/50 cursor-pointer hover:bg-slate-800 transition text-left">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-sm shadow-inner" id="display-user-initial">U</div>
+                        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-sm shadow-inner shrink-0" id="display-user-initial">U</div>
                         <div class="flex-1 overflow-hidden">
                             <p class="text-[13px] font-bold text-white truncate leading-tight" id="display-user-name">User Name</p>
                             <p class="text-[10px] text-brand-300 font-medium uppercase truncate mt-0.5" id="display-user-role">Administrator</p>
                         </div>
                     </div>
-                </div>
+                </button>
             </div>
         </aside>
 
@@ -247,13 +277,13 @@
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span> <span class="hidden sm:inline">Terkoneksi</span>
                     </span>
                     <div class="h-8 w-px bg-slate-200 hidden lg:block"></div>
-                    <button onclick="window.toggleProfileModal(true)" class="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors cursor-pointer p-1.5 rounded-lg hover:bg-slate-50">
-                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 lg:hidden">
+                    <button type="button" onclick="window.toggleProfileModal(true)" class="relative z-[60] flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors cursor-pointer p-1.5 rounded-lg hover:bg-slate-50">
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 lg:hidden pointer-events-none">
                             <i class="fa-solid fa-user text-slate-400"></i>
                         </div>
-                        <i class="fa-solid fa-circle-user text-2xl text-slate-300 hidden lg:block"></i>
-                        <span class="hidden sm:block font-bold text-slate-700" id="header-user-name">Akun Saya</span>
-                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 hidden sm:block"></i>
+                        <i class="fa-solid fa-circle-user text-2xl text-slate-300 hidden lg:block pointer-events-none"></i>
+                        <span class="hidden sm:block font-bold text-slate-700 pointer-events-none" id="header-user-name">Akun Saya</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 hidden sm:block pointer-events-none"></i>
                     </button>
                 </div>
             </header>
@@ -1264,6 +1294,39 @@
         </div>
     </div>
 
+    <!-- MODAL PROFIL IDENTITAS -->
+    <div id="profile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[100]">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-900 text-white">
+                <h3 class="font-extrabold text-sm uppercase tracking-wide flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-brand-500/20 flex items-center justify-center text-brand-400"><i class="fa-solid fa-id-badge"></i></div> Profil Akun</h3>
+                <button onclick="window.toggleProfileModal(false)" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 text-center bg-white border-b border-slate-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-lg shadow-brand-500/20" id="profile-modal-initial">U</div>
+                <h4 class="text-xl font-black text-slate-800 mb-1 leading-tight" id="profile-modal-name">Nama Pengguna</h4>
+                <p class="text-xs font-bold text-slate-500 mb-3" id="profile-modal-email">email@domain.com</p>
+                <span id="profile-modal-role" class="px-3 py-1.5 rounded-lg bg-brand-50 text-brand-700 text-[10px] font-black uppercase tracking-widest border border-brand-200 inline-block">Administrator</span>
+            </div>
+            <div class="p-6 bg-slate-50 space-y-4">
+                
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-left">
+                    <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-2"><i class="fa-solid fa-share-nodes text-brand-500 mr-1"></i> Kode Perusahaan (Berikan Ke Staff)</p>
+                    <div class="flex items-center gap-2">
+                        <code id="profile-company-code" class="flex-1 bg-slate-50 p-2.5 rounded-lg text-xs font-mono font-black text-slate-700 border border-slate-200 truncate select-all">...</code>
+                        <button onclick="window.copyCompanyCode()" class="w-10 h-10 shrink-0 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-500 hover:text-white transition-colors border border-brand-200 flex items-center justify-center shadow-sm" title="Salin Kode"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <button onclick="window.handleLogout()" class="w-full px-5 py-3.5 bg-rose-50 text-rose-600 font-extrabold rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center gap-2 border border-rose-200 shadow-sm">
+                        <i class="fa-solid fa-right-from-bracket"></i> Kunci & Keluar
+                    </button>
+                    <button onclick="window.toggleProfileModal(false)" class="w-full px-5 py-3.5 text-slate-500 text-sm font-bold hover:bg-slate-200 bg-slate-100 rounded-xl transition-colors border border-slate-200">Tutup Jendela</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- FIREBASE SDK & MAIN LOGIC SAAS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -1356,14 +1419,37 @@
             }
         };
 
-        // States
+        // UI Auth Registrasi Toggler
+        window.regMode = 'admin';
+        window.setRegMode = (mode) => {
+            window.regMode = mode;
+            const btnA = document.getElementById('tab-reg-admin'); const btnS = document.getElementById('tab-reg-staff');
+            const fA = document.getElementById('reg-admin-fields'); const fS = document.getElementById('reg-staff-fields');
+            
+            if (mode === 'admin') {
+                btnA.className = "flex-1 py-2 text-xs font-extrabold bg-white shadow-sm rounded-lg text-brand-600 transition-all tracking-wide";
+                btnS.className = "flex-1 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition-all tracking-wide";
+                fA.classList.remove('hidden'); fS.classList.add('hidden');
+                document.getElementById('reg-name').required = true;
+                document.getElementById('reg-company-code').required = false; document.getElementById('reg-staff-name').required = false;
+            } else {
+                btnS.className = "flex-1 py-2 text-xs font-extrabold bg-white shadow-sm rounded-lg text-brand-600 transition-all tracking-wide";
+                btnA.className = "flex-1 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition-all tracking-wide";
+                fA.classList.add('hidden'); fS.classList.remove('hidden');
+                document.getElementById('reg-name').required = false;
+                document.getElementById('reg-company-code').required = true; document.getElementById('reg-staff-name').required = true;
+            }
+        };
+
+        // States & Pointers
         window.clients = []; window.suppliers = []; window.deals = []; window.invoices = [];
         window.transactions = []; window.inventory = []; window.purchaseOrders = [];
         window.companySettings = { name: "Workspace Baru", slogan: "-", address: "-", phone: "-", email: "-", bank: "-", signature: "" };
         window.user = null;
+        window.currentWorkspaceId = ""; // Dynamic Workspace Pointer
 
-        const getCollRef = (collName) => collection(db, 'artifacts', appId, 'users', window.user.uid, collName);
-        const getDocRef = (collName, id) => doc(db, 'artifacts', appId, 'users', window.user.uid, collName, id);
+        const getCollRef = (collName) => collection(db, 'artifacts', appId, 'users', window.currentWorkspaceId, collName);
+        const getDocRef = (collName, id) => doc(db, 'artifacts', appId, 'users', window.currentWorkspaceId, collName, id);
         
         let unsubscribes = [];
 
@@ -1379,19 +1465,28 @@
         onAuthStateChanged(auth, async (u) => {
             if (u) {
                 window.user = u;
+                window.currentWorkspaceId = u.uid; // Default ke milik sendiri
+                
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('app-screen').style.display = 'flex';
                 
-                let currentName = "User Admin";
+                let currentName = "User";
                 let currentEmail = u.email || "No Email";
+                let currentUserRole = "Admin Utama";
                 if (u.email) currentName = u.email.split('@')[0];
 
                 try {
+                    // Cek profil user: Apakah dia Admin atau Karyawan yang menumpang di Workspace orang lain?
                     const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', u.uid));
-                    if (userDoc.exists() && userDoc.data().name) {
-                        currentName = userDoc.data().name;
+                    if (userDoc.exists()) {
+                        const d = userDoc.data();
+                        currentName = d.name || currentName;
+                        currentUserRole = d.role || currentUserRole;
+                        if (d.isStaff && d.workspaceId) {
+                            window.currentWorkspaceId = d.workspaceId; // Pindahkan pointer ke DB Bos/Admin
+                        }
                     } 
                 } catch (e) { 
                     handleFirebaseError(e); 
@@ -1399,10 +1494,16 @@
                 
                 document.getElementById('display-user-name').innerText = currentName;
                 document.getElementById('display-user-initial').innerText = currentName.charAt(0).toUpperCase();
+                document.getElementById('display-user-role').innerText = currentUserRole;
+                
                 document.getElementById('header-user-name').innerText = currentName;
                 document.getElementById('profile-modal-name').innerText = currentName;
                 document.getElementById('profile-modal-email').innerText = currentEmail;
+                document.getElementById('profile-modal-role').innerText = currentUserRole;
                 document.getElementById('profile-modal-initial').innerText = currentName.charAt(0).toUpperCase();
+                
+                // Set Kode Perusahaan
+                document.getElementById('profile-company-code').innerText = window.currentWorkspaceId;
                 
                 document.getElementById('loading-overlay').style.display = 'none';
                 startCloudSync();
@@ -1418,6 +1519,17 @@
                 document.getElementById('form-register').classList.add('hidden');
             }
         });
+
+        window.copyCompanyCode = () => {
+            const code = document.getElementById('profile-company-code').innerText;
+            const tempInput = document.createElement("input");
+            tempInput.value = code;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("✅ Kode berhasil disalin!\n\nBerikan kode ini kepada karyawan Anda agar mereka bisa mendaftar dan bergabung ke perusahaan ini.");
+        };
 
         window.toggleAuthMode = () => {
             document.getElementById('form-login').classList.toggle('hidden');
@@ -1443,30 +1555,42 @@
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             const oldText = btn.innerText;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Membuat...'; btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memproses...'; btn.disabled = true;
             try {
-                const name = document.getElementById('reg-name').value.trim();
                 const email = document.getElementById('reg-email').value.trim();
                 const pass = document.getElementById('reg-password').value;
+                let name = "", isStaff = false, workspaceId = "";
                 
-                // Buat Akun Firebase Auth
+                if (window.regMode === 'admin') {
+                    name = document.getElementById('reg-name').value.trim();
+                } else {
+                    name = document.getElementById('reg-staff-name').value.trim();
+                    workspaceId = document.getElementById('reg-company-code').value.trim();
+                    isStaff = true;
+                }
+                
+                // Create Auth User
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                 
-                // Setup Database Workspace
+                // Setup Profile User di DB
                 try {
-                    await setDoc(doc(db, 'artifacts', appId, 'users', userCred.user.uid), {
-                        name: name, email: email, createdAt: new Date().toISOString()
-                    });
+                    if (isStaff) {
+                        await setDoc(doc(db, 'artifacts', appId, 'users', userCred.user.uid), {
+                            name: name, email: email, role: "Staff Karyawan", isStaff: true, workspaceId: workspaceId, createdAt: new Date().toISOString()
+                        });
+                    } else {
+                        await setDoc(doc(db, 'artifacts', appId, 'users', userCred.user.uid), {
+                            name: name, email: email, role: "Admin Utama", isStaff: false, createdAt: new Date().toISOString()
+                        });
+                    }
                 } catch (dbErr) {
                     if (dbErr.code === 'permission-denied' || dbErr.message.includes('permissions')) {
-                        alert("✅ Akun berhasil didaftarkan!\n\n❌ Namun, Database Anda masih digembok oleh Firebase (Permission Denied).\n\nSilakan ubah tab 'Rules' di Firestore Database Anda sesuai petunjuk, lalu muat ulang (refresh) halaman ini dan cobalah Masuk (Login) menggunakan email yang baru saja dibuat.");
-                    } else {
-                        throw dbErr;
-                    }
+                        alert("✅ Akun berhasil didaftarkan!\n\n❌ Namun, Firestore Database Firebase Anda belum disetting Rules-nya. Silakan update Rules Firebase Anda terlebih dahulu agar sistem bisa membaca data.");
+                    } else { throw dbErr; }
                 }
             } catch (err) {
                 if (err.code === 'auth/email-already-in-use') {
-                    alert("Pendaftaran Gagal: Email ini sudah terdaftar di sistem! Silakan klik tombol 'Batal' dan gunakan menu login untuk masuk ke Workspace Anda.");
+                    alert("Pendaftaran Gagal: Email ini sudah pernah didaftarkan! Gunakan email lain atau kembali ke form Login.");
                 } else if (err.code === 'auth/weak-password') {
                     alert("Pendaftaran Gagal: Kata sandi terlalu lemah. Gunakan minimal 6 karakter.");
                 } else {
