@@ -430,9 +430,18 @@
                             <h2 class="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">Ikhtisar Bisnis</h2>
                             <p class="text-sm text-slate-500 mt-1 font-medium">Pantau performa perusahaan Anda secara real-time dari Cloud.</p>
                         </div>
-                        <button class="bg-white border-2 border-slate-100 text-slate-700 px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors w-full sm:w-auto active:scale-95">
-                            <i class="fa-regular fa-calendar-days text-brand-500"></i> Bulan Ini <i class="fa-solid fa-chevron-down text-[10px] ml-1 text-slate-400"></i>
-                        </button>
+                        <div class="relative w-full sm:w-auto">
+                            <button onclick="window.toggleDateFilter()" id="btn-date-filter" type="button" class="bg-white border-2 border-slate-100 text-slate-700 px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors w-full sm:w-auto active:scale-95">
+                                <i class="fa-regular fa-calendar-days text-brand-500"></i> <span id="label-date-filter">Bulan Ini</span> <i class="fa-solid fa-chevron-down text-[10px] ml-1 text-slate-400"></i>
+                            </button>
+                            <!-- Dropdown Menu -->
+                            <div id="dropdown-date-filter" class="hidden absolute right-0 top-full mt-2 w-full sm:w-48 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in">
+                                <button onclick="window.setDateFilter('Hari Ini')" type="button" class="w-full text-left px-5 py-3 text-sm font-bold text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-colors border-b border-slate-50">Hari Ini</button>
+                                <button onclick="window.setDateFilter('Bulan Ini')" type="button" class="w-full text-left px-5 py-3 text-sm font-bold text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-colors border-b border-slate-50">Bulan Ini</button>
+                                <button onclick="window.setDateFilter('Tahun Ini')" type="button" class="w-full text-left px-5 py-3 text-sm font-bold text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-colors border-b border-slate-50">Tahun Ini</button>
+                                <button onclick="window.setDateFilter('Semua Waktu')" type="button" class="w-full text-left px-5 py-3 text-sm font-bold text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-colors">Semua Waktu</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Metric Cards (App Style) -->
@@ -2113,6 +2122,30 @@
         window.deletePO = async (id) => { if(confirm("Hapus PO permanen?")) await deleteDoc(getDocRef('purchase_orders', id)); };
 
         // --- UI TOGGLERS ---
+        window.toggleDateFilter = () => {
+            const dropdown = document.getElementById('dropdown-date-filter');
+            if(dropdown) dropdown.classList.toggle('hidden');
+        };
+
+        window.setDateFilter = (label) => {
+            const labelEl = document.getElementById('label-date-filter');
+            const dropdown = document.getElementById('dropdown-date-filter');
+            if(labelEl) {
+                labelEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                setTimeout(() => { labelEl.innerText = label; }, 400); // Simulasi efek loading sesaat
+            }
+            if(dropdown) dropdown.classList.add('hidden');
+        };
+
+        // Menutup dropdown jika diklik di luar area tombol
+        document.addEventListener('click', (e) => {
+            const btn = document.getElementById('btn-date-filter');
+            const dropdown = document.getElementById('dropdown-date-filter');
+            if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
         window.switchTab = (id) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-'+id).classList.add('active');
