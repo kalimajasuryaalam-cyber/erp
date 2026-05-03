@@ -80,7 +80,7 @@
 
     <!-- AUTH SCREEN (LAYAR LOGIN / DAFTAR SAAS) -->
     <div id="auth-screen" class="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center flex flex-col items-center justify-center p-4 z-[9999] hidden before:content-[''] before:absolute before:inset-0 before:bg-slate-900/70 before:backdrop-blur-sm">
-        <div class="glass-card rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative z-10 animate-slide-up border border-white/20">
+        <div class="glass-card rounded-3xl shadow-2xl w-full max-w-md max-h-[95vh] overflow-x-hidden overflow-y-auto custom-scrollbar relative z-10 animate-slide-up border border-white/20">
             <div class="p-8 text-center border-b border-slate-100 bg-gradient-to-b from-white to-transparent">
                 <div class="w-16 h-16 bg-gradient-to-tr from-brand-600 to-brand-400 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg shadow-brand-500/30 transform transition hover:scale-105">
                     <i class="fa-solid fa-cloud-bolt"></i>
@@ -1309,8 +1309,8 @@
             </div>
             <div class="p-6 bg-slate-50 space-y-4">
                 
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-left">
-                    <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-2"><i class="fa-solid fa-share-nodes text-brand-500 mr-1"></i> Kode Perusahaan (Berikan Ke Staff)</p>
+                <div id="profile-company-code-container" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-left">
+                    <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-2"><i class="fa-solid fa-share-nodes text-brand-500 mr-1"></i> Kode Akses (Khusus Admin)</p>
                     <div class="flex items-center gap-2">
                         <code id="profile-company-code" class="flex-1 bg-slate-50 p-2.5 rounded-lg text-xs font-mono font-black text-slate-700 border border-slate-200 truncate select-all">...</code>
                         <button onclick="window.copyCompanyCode()" class="w-10 h-10 shrink-0 bg-brand-50 text-brand-600 rounded-lg hover:bg-brand-500 hover:text-white transition-colors border border-brand-200 flex items-center justify-center shadow-sm" title="Salin Kode"><i class="fa-solid fa-copy"></i></button>
@@ -1486,8 +1486,13 @@
                         currentUserRole = d.role || currentUserRole;
                         if (d.isStaff && d.workspaceId) {
                             window.currentWorkspaceId = d.workspaceId; // Pindahkan pointer ke DB Bos/Admin
+                            document.getElementById('profile-company-code-container').classList.add('hidden'); // Sembunyikan kode dari Staf
+                        } else {
+                            document.getElementById('profile-company-code-container').classList.remove('hidden'); // Tampilkan kode ke Admin
                         }
-                    } 
+                    } else {
+                        document.getElementById('profile-company-code-container').classList.remove('hidden');
+                    }
                 } catch (e) { 
                     handleFirebaseError(e); 
                 }
