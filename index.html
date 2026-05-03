@@ -149,7 +149,7 @@
         <div id="mobile-sidebar-overlay" onclick="window.toggleMobileMenu()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity lg:hidden"></div>
 
         <!-- SIDEBAR (RESPONSIVE) -->
-        <aside id="app-sidebar" class="fixed lg:relative inset-y-0 left-0 z-50 w-72 bg-brand-950 text-slate-300 flex flex-col flex-shrink-0 transition-transform duration-300 -translate-x-full lg:translate-x-0 border-r border-slate-800 shadow-2xl lg:shadow-none">
+        <aside id="app-sidebar" class="fixed lg:relative inset-y-0 left-0 z-50 w-72 h-screen bg-brand-950 text-slate-300 flex flex-col flex-shrink-0 transition-transform duration-300 -translate-x-full lg:translate-x-0 border-r border-slate-800 shadow-2xl lg:shadow-none">
             
             <!-- Mobile Close Button -->
             <button onclick="window.toggleMobileMenu()" class="lg:hidden absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-lg">
@@ -170,7 +170,7 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 custom-scrollbar">
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 custom-scrollbar min-h-0">
                 <p class="px-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mb-3">Menu Utama</p>
                 <button onclick="window.switchTab('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-brand-600 text-white shadow-lg shadow-brand-500/20 font-semibold text-sm hover:-translate-y-0.5">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i> Ikhtisar Bisnis
@@ -1448,12 +1448,30 @@
                 const name = document.getElementById('reg-name').value.trim();
                 const email = document.getElementById('reg-email').value.trim();
                 const pass = document.getElementById('reg-password').value;
+                
+                // Buat Akun Firebase Auth
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, 'artifacts', appId, 'users', userCred.user.uid), {
-                    name: name, email: email, createdAt: new Date().toISOString()
-                });
+                
+                // Setup Database Workspace
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'users', userCred.user.uid), {
+                        name: name, email: email, createdAt: new Date().toISOString()
+                    });
+                } catch (dbErr) {
+                    if (dbErr.code === 'permission-denied' || dbErr.message.includes('permissions')) {
+                        alert("✅ Akun berhasil didaftarkan!\n\n❌ Namun, Database Anda masih digembok oleh Firebase (Permission Denied).\n\nSilakan ubah tab 'Rules' di Firestore Database Anda sesuai petunjuk, lalu muat ulang (refresh) halaman ini dan cobalah Masuk (Login) menggunakan email yang baru saja dibuat.");
+                    } else {
+                        throw dbErr;
+                    }
+                }
             } catch (err) {
-                alert("Gagal Daftar: " + err.message);
+                if (err.code === 'auth/email-already-in-use') {
+                    alert("Pendaftaran Gagal: Email ini sudah terdaftar di sistem! Silakan klik tombol 'Batal' dan gunakan menu login untuk masuk ke Workspace Anda.");
+                } else if (err.code === 'auth/weak-password') {
+                    alert("Pendaftaran Gagal: Kata sandi terlalu lemah. Gunakan minimal 6 karakter.");
+                } else {
+                    alert("Gagal Daftar: " + err.message);
+                }
                 btn.innerText = oldText; btn.disabled = false;
             }
         };
