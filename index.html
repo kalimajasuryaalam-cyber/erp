@@ -1745,8 +1745,7 @@
                 if (isSuspended && u.email !== window.OWNER_EMAIL) {
                     document.getElementById('suspended-overlay').style.display = 'flex';
                     document.getElementById('app-screen').classList.add('hidden');
-                    document.getElementById('loading-overlay').style.display = 'none';
-                    return; // Hentikan eksekusi, layar terkunci
+                    document.getElementById('app-screen').style.display = 'none';
                 } else {
                     document.getElementById('suspended-overlay').style.display = 'none';
                     document.getElementById('app-screen').classList.remove('hidden');
@@ -1901,7 +1900,7 @@
         window.renderMasterDashboard = () => {
             document.getElementById('master-total-clients').innerText = window.allSaaSClients.length;
             const tb = document.getElementById('master-tbody');
-            if (window.allSaaSClients.length === 0) return tb.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">Belum ada klien yang terdaftar di sistem SaaS Anda.</td></tr>`;
+            if (window.allSaaSClients.length === 0) return tb.innerHTML = `<tr><td colspan="5" class="p-10 text-center bg-slate-50 border-b border-slate-100"><div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner"><i class="fa-solid fa-satellite-dish animate-pulse"></i></div><h3 class="font-black text-slate-800 text-lg mb-1">Koneksi Master Aktif!</h3><p class="text-sm font-medium text-slate-500 mb-4">Sistem Anda sudah online, namun saat ini belum ada Klien/Perusahaan yang mendaftar.</p><div class="inline-block bg-white p-4 rounded-2xl border border-brand-200 shadow-sm text-left max-w-sm"><p class="text-xs font-black text-brand-600 uppercase tracking-widest mb-2"><i class="fa-solid fa-flask text-brand-500 mr-1"></i> Cara Menguji Koneksi Remote:</p><p class="text-[11px] text-slate-600 font-medium leading-relaxed">1. Buka tab baru di browser Anda (Gunakan Mode Samaran / Incognito).<br>2. Daftar sebagai "Perusahaan Baru" menggunakan email lain (misal: klien@gmail.com).<br>3. Datanya akan langsung muncul di sini secara <b>Real-Time!</b></p></div></td></tr>`;
             
             let html = '';
             window.allSaaSClients.forEach(c => {
@@ -1951,6 +1950,19 @@
         function startCloudSync() {
             if (!window.user) return;
             unsubscribes.forEach(u => u()); unsubscribes = [];
+
+            // 0. SENSOR KUNCI AKSES REAL-TIME (Koneksi Live ke Admin Owner)
+            if (window.user.email !== window.OWNER_EMAIL) {
+                unsubscribes.push(onSnapshot(doc(db, 'artifacts', appId, 'users', window.currentWorkspaceId), (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().status === 'suspended') {
+                        document.getElementById('suspended-overlay').style.display = 'flex';
+                        document.getElementById('app-screen').style.display = 'none';
+                    } else {
+                        document.getElementById('suspended-overlay').style.display = 'none';
+                        document.getElementById('app-screen').style.display = 'flex';
+                    }
+                }, handleFirebaseError));
+            }
 
             window.populateClientDropdowns = () => {
                 const dealClient = document.getElementById('deal-client');
