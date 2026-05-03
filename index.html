@@ -445,7 +445,7 @@
             <main class="flex-1 overflow-y-auto p-4 lg:p-8 relative pb-24 lg:pb-8 safe-pb custom-scrollbar">
                 
                 <!-- SAAS MASTER TAB (KHUSUS PEMILIK) -->
-                <div id="tab-master" class="tab-content space-y-6 max-w-7xl mx-auto hidden">
+                <div id="tab-master" class="tab-content space-y-6 max-w-7xl mx-auto">
                     <div class="bg-rose-50 border border-rose-200 p-6 rounded-[2rem] flex flex-col sm:flex-row gap-5 items-center justify-between mb-4">
                         <div class="flex items-center gap-4">
                             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-rose-500/30"><i class="fa-solid fa-user-shield"></i></div>
@@ -2347,13 +2347,17 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-'+id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => { 
-                b.classList.remove('bg-gradient-to-r', 'from-brand-600', 'to-brand-500', 'text-white', 'shadow-lg'); 
+                b.classList.remove('bg-gradient-to-r', 'from-brand-600', 'to-brand-500', 'text-white', 'shadow-lg', 'from-rose-600', 'to-rose-500', 'shadow-rose-500/20', 'shadow-brand-500/20'); 
                 b.classList.add('text-slate-400'); 
             });
             const btn = document.getElementById('btn-'+id);
             if(btn) {
                 btn.classList.remove('text-slate-400');
-                btn.classList.add('bg-gradient-to-r', 'from-brand-600', 'to-brand-500', 'text-white', 'shadow-lg');
+                if(id === 'master') {
+                    btn.classList.add('bg-gradient-to-r', 'from-rose-600', 'to-rose-500', 'text-white', 'shadow-lg', 'shadow-rose-500/20');
+                } else {
+                    btn.classList.add('bg-gradient-to-r', 'from-brand-600', 'to-brand-500', 'text-white', 'shadow-lg', 'shadow-brand-500/20');
+                }
             }
             
             // Auto close mobile sidebar when tab changes
